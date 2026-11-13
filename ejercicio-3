@@ -1,0 +1,106 @@
+import math
+import tkinter as tk
+from tkinter import scrolledtext
+
+
+class CalculosNumericos:
+    """
+    Esta clase denominada CalculosNumericos permite realizar dos
+    cálculos matemáticos: calcular el logaritmo neperiano de un valor y
+    calcular la raíz cuadrada de un valor.
+    """
+
+    @staticmethod
+    def calcular_logaritmo_neperiano(valor, funcion_imprimir=print):
+        """
+        Calcula el logaritmo neperiano de un valor numérico.
+        Si el valor pasado como parámetro no es correcto, se genera la
+        excepción correspondiente.
+        """
+        try:
+            if valor <= 0:
+                raise ArithmeticError("El valor debe ser un número positivo")
+
+            resultado = math.log(valor)
+            funcion_imprimir(f"Resultado = {resultado}")
+
+        except ArithmeticError:
+            funcion_imprimir("El valor debe ser un número positivo para calcular el logaritmo")
+        except TypeError:
+            funcion_imprimir("El valor debe ser numérico para calcular el logaritmo")
+
+    @staticmethod
+    def calcular_raiz_cuadrada(valor, funcion_imprimir=print):
+        """
+        Calcula la raíz cuadrada de un valor numérico.
+        Si el valor pasado como parámetro no es correcto, se genera la
+        excepción correspondiente.
+        """
+        try:
+            if valor < 0:
+                raise ArithmeticError("El valor debe ser un número positivo")
+
+            resultado = math.sqrt(valor)
+            funcion_imprimir(f"Resultado = {resultado}")
+
+        except ArithmeticError:
+            funcion_imprimir("El valor debe ser un número positivo para calcular la raíz cuadrada")
+        except TypeError:
+            funcion_imprimir("El valor debe ser numérico para calcular la raíz cuadrada")
+
+
+class InterfazCalculos:
+    """Clase para la interfaz gráfica y la recolección de datos por teclado."""
+
+    def __init__(self, master):
+        """Inicializa la ventana principal y los controles de entrada y salida."""
+        self.master = master
+        master.title("Prueba de Excepciones - Ejercicio 6.6")
+        master.geometry("450x450")
+
+        tk.Label(master, text="Valor numérico =").pack(pady=(15, 0))
+        self.entry_valor = tk.Entry(master, width=35)
+        self.entry_valor.pack()
+
+        self.btn_ejecutar = tk.Button(master, text="Ejecutar Cálculos", command=self.ejecutar_calculos)
+        self.btn_ejecutar.pack(pady=20)
+
+        self.consola = scrolledtext.ScrolledText(master, width=50, height=15, state='disabled')
+        self.consola.pack(padx=10, pady=10)
+
+    def imprimir_pantalla(self, mensaje):
+        """Simula System.out.println() imprimiendo en el widget de texto."""
+        self.consola.config(state='normal')
+        self.consola.insert(tk.END, mensaje + "\n")
+        self.consola.see(tk.END)
+        self.consola.config(state='disabled')
+
+    def limpiar_pantalla(self):
+        """Limpia el área de la consola antes de cada ejecución."""
+        self.consola.config(state='normal')
+        self.consola.delete('1.0', tk.END)
+        self.consola.config(state='disabled')
+
+    def ejecutar_calculos(self):
+        """
+        Equivalente al método main. Solicita un valor numérico y ejecuta
+        el cálculo del logaritmo neperiano y de la raíz cuadrada.
+        """
+        self.limpiar_pantalla()
+        entrada_texto = self.entry_valor.get().strip()
+
+        self.imprimir_pantalla(f"Valor numérico = {entrada_texto}")
+
+        try:
+            valor_numerico = float(entrada_texto)
+        except ValueError:
+            valor_numerico = entrada_texto
+
+        CalculosNumericos.calcular_logaritmo_neperiano(valor_numerico, self.imprimir_pantalla)
+        CalculosNumericos.calcular_raiz_cuadrada(valor_numerico, self.imprimir_pantalla)
+
+
+if __name__ == "__main__":
+    ventana = tk.Tk()
+    app = InterfazCalculos(ventana)
+    ventana.mainloop()
