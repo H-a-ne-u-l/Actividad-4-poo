@@ -1,0 +1,81 @@
+import tkinter as tk
+from tkinter import scrolledtext
+
+class PruebaExcepciones:
+    """
+    Esta clase denominada PruebaExcepciones lanza diferentes
+    excepciones en situaciones específicas del programa. Los mensajes
+    que se muestran en pantalla ayudan a identificar la porción de código
+    que se ejecutó o no.
+    @version 1.2/2020
+    """
+
+    @staticmethod
+    def main(args=None, imprimir=print):
+        """
+        Método main con dos bloques try que generan excepciones que
+        deben ser gestionadas.
+        @throws ArithmeticError (ArithmeticException en Java): Excepción aritmética de división por cero
+        @throws Exception: Excepción general
+        """
+        try:
+            imprimir("Ingresando al primer try")
+            cociente = 10000 / 0
+            imprimir("Después de la división")
+        except ArithmeticError as e:
+            imprimir("División por cero")
+        finally:
+            imprimir("Ingresando al primer finally")
+
+        try:
+            imprimir("Ingresando al segundo try")
+            objeto = None
+            objeto.toString()
+            imprimir("Imprimiendo objeto")
+        except ArithmeticError as e:
+            imprimir("División por cero")
+        except Exception as e:
+            imprimir("Ocurrió una excepción")
+        finally:
+            imprimir("Ingresando al segundo finally")
+
+
+class InterfazExcepciones:
+    """Clase dedicada exclusivamente a la interfaz gráfica para no alterar el UML de PruebaExcepciones."""
+    
+    def __init__(self, master):
+        self.master = master
+        master.title("Prueba de Excepciones - Ejercicio 6.4")
+        master.geometry("420x350")
+        
+        self.btn_ejecutar = tk.Button(
+            master, 
+            text="Ejecutar Prueba", 
+            command=self.ejecutar_prueba
+        )
+        self.btn_ejecutar.pack(pady=15)
+        
+        self.consola = scrolledtext.ScrolledText(master, width=48, height=15, state='disabled')
+        self.consola.pack(padx=10, pady=10)
+
+    def imprimir_pantalla(self, mensaje):
+        """Simula la instrucción System.out.println() de Java en el widget de texto."""
+        self.consola.config(state='normal')
+        self.consola.insert(tk.END, mensaje + "\n")
+        self.consola.see(tk.END)
+        self.consola.config(state='disabled')
+
+    def limpiar_pantalla(self):
+        self.consola.config(state='normal')
+        self.consola.delete('1.0', tk.END)
+        self.consola.config(state='disabled')
+
+    def ejecutar_prueba(self):
+        self.limpiar_pantalla()
+        PruebaExcepciones.main(imprimir=self.imprimir_pantalla)
+
+
+if __name__ == "__main__":
+    ventana_principal = tk.Tk()
+    app = InterfazExcepciones(ventana_principal)
+    ventana_principal.mainloop()
