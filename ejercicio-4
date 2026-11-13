@@ -1,0 +1,140 @@
+import tkinter as tk
+from tkinter import scrolledtext
+
+class Programador:
+    """Modela un integrante de un equipo de programadores."""
+    def __init__(self, nombre, apellidos):
+        self.__nombre = nombre
+        self.__apellidos = apellidos
+
+    @property
+    def nombre(self):
+        return self.__nombre
+
+    @property
+    def apellidos(self):
+        return self.__apellidos
+
+
+class EquipoMaratonProgramacion:
+    """Modela un equipo de programadores que participa en la maratón."""
+    def __init__(self, nombre_equipo, universidad, lenguaje_programacion):
+        self.__nombre_equipo = nombre_equipo
+        self.__universidad = universidad
+        self.__lenguaje_programacion = lenguaje_programacion
+        self.__tamano_equipo = 0
+        self.__programadores = [None, None, None]
+
+    def esta_lleno(self):
+        """Determina si el array de programadores está lleno."""
+        return self.__tamano_equipo == len(self.__programadores)
+
+    def anadir(self, programador):
+        """Añade un programador al equipo si hay espacio disponible."""
+        if self.esta_lleno():
+            raise Exception("El equipo está completo. No se pudo agregar programador.")
+        self.__programadores[self.__tamano_equipo] = programador
+        self.__tamano_equipo += 1
+
+    @staticmethod
+    def validar_campo(campo):
+        """Valida que el campo no esté vacío, no tenga dígitos y no supere los 20 caracteres."""
+        if not campo.strip():
+            raise Exception("El campo no puede estar vacío.")
+        for c in campo:
+            if c.isdigit():
+                raise Exception("El campo no puede tener dígitos.")
+        if len(campo) > 20:
+            raise Exception("La longitud no debe ser superior a 20 caracteres.")
+
+
+class InterfazMaraton:
+    """Interfaz gráfica para el registro y validación de la maratón de programación."""
+    def __init__(self, master):
+        self.master = master
+        master.title("Ejercicio 6.7 - Maratón de Programación")
+        master.geometry("500x680")
+
+        tk.Label(master, text="Nombre del equipo:").pack(pady=(10, 0))
+        self.entry_equipo = tk.Entry(master, width=40)
+        self.entry_equipo.pack()
+
+        tk.Label(master, text="Universidad:").pack(pady=(5, 0))
+        self.entry_universidad = tk.Entry(master, width=40)
+        self.entry_universidad.pack()
+
+        tk.Label(master, text="Lenguaje de programación:").pack(pady=(5, 0))
+        self.entry_lenguaje = tk.Entry(master, width=40)
+        self.entry_lenguaje.pack()
+
+        tk.Label(master, text="--- Integrantes del Equipo (3 programadores) ---", font=("Arial", 10, "bold")).pack(pady=(15, 5))
+
+        self.integrantes_entries = []
+        for i in range(1, 4):
+            frame = tk.LabelFrame(master, text=f" Integrante {i} ")
+            frame.pack(fill="x", padx=20, pady=5)
+
+            tk.Label(frame, text="Nombre:").pack(anchor="w", padx=5)
+            e_nom = tk.Entry(frame, width=35)
+            e_nom.pack(padx=5, pady=2)
+
+            tk.Label(frame, text="Apellidos:").pack(anchor="w", padx=5)
+            e_ape = tk.Entry(frame, width=35)
+            e_ape.pack(padx=5, pady=2)
+
+            self.integrantes_entries.append((e_nom, e_ape))
+
+        self.btn_ejecutar = tk.Button(master, text="Registrar y Validar Equipo", command=self.ejecutar_registro)
+        self.btn_ejecutar.pack(pady=10)
+
+        self.consola = scrolledtext.ScrolledText(master, width=58, height=8, state='disabled')
+        self.consola.pack(padx=10, pady=5)
+
+    def imprimir_pantalla(self, mensaje):
+        self.consola.config(state='normal')
+        self.consola.insert(tk.END, mensaje + "\n")
+        self.consola.see(tk.END)
+        self.consola.config(state='disabled')
+
+    def limpiar_pantalla(self):
+        self.consola.config(state='normal')
+        self.consola.delete('1.0', tk.END)
+        self.consola.config(state='disabled')
+
+    def ejecutar_registro(self):
+        self.limpiar_pantalla()
+        try:
+            nombre = self.entry_equipo.get()
+            universidad = self.entry_universidad.get()
+            lenguaje = self.entry_lenguaje.get()
+
+            self.imprimir_pantalla(f"Nombre del equipo = \n{nombre}")
+            self.imprimir_pantalla(f"Universidad = \n{universidad}")
+            self.imprimir_pantalla(f"Lenguaje de programación = \n{lenguaje}")
+            self.imprimir_pantalla("Datos de los integrantes del equipo")
+
+            equipo = EquipoMaratonProgramacion(nombre, universidad, lenguaje)
+
+            for e_nom, e_ape in self.integrantes_entries:
+                nom_prog = e_nom.get()
+                self.imprimir_pantalla(f"Nombre del integrante = \n{nom_prog}")
+                EquipoMaratonProgramacion.validar_campo(nom_prog)
+
+                ape_prog = e_ape.get()
+                self.imprimir_pantalla(f"Apellidos del integrante = \n{ape_prog}")
+                EquipoMaratonProgramacion.validar_campo(ape_prog)
+
+                prog = Programador(nom_prog, ape_prog)
+                equipo.anadir(prog)
+
+            self.imprimir_pantalla("¡Equipo registrado exitosamente sin excepciones!")
+
+        except Exception as e:
+            self.imprimir_pantalla(f"java.lang.Exception: {e}")
+            self.imprimir_pantalla("at Excepciones.EquipoMaratonProgramacion.validarCampo(EquipoMaratonProgramacion.java)")
+
+
+if __name__ == "__main__":
+    ventana = tk.Tk()
+    app = InterfazMaraton(ventana)
+    ventana.mainloop()
