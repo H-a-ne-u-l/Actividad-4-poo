@@ -1,1 +1,119 @@
+import tkinter as tk
+from tkinter import scrolledtext
 
+
+class IllegalArgumentException(ValueError):
+    """
+    Excepción personalizada que representa java.lang.IllegalArgumentException
+    para diferenciarla de errores de conversión de tipos en Python.
+    """
+    pass
+
+
+class Vendedor:
+    """
+    Clase Vendedor que modela un vendedor con atributos de nombre, apellidos y edad.
+    """
+
+    def __init__(self, nombre, apellidos):
+        """Constructor que inicializa el nombre y los apellidos del vendedor."""
+        self.__nombre = nombre
+        self.__apellidos = apellidos
+        self.__edad = 0
+
+    def imprimir(self, funcion_imprimir=print):
+        """Muestra por pantalla los datos registrados del vendedor."""
+        funcion_imprimir(f"Nombre del vendedor = {self.__nombre}")
+        funcion_imprimir(f"Apellidos del vendedor = {self.__apellidos}")
+        funcion_imprimir(f"Edad del vendedor = {self.__edad}")
+
+    def verificar_edad(self, edad):
+        """
+        Verifica que la edad del vendedor sea apropiada.
+        Lanza IllegalArgumentException si no cumple los requisitos establecidos.
+        """
+        if 0 <= edad < 18:
+            raise IllegalArgumentException("El vendedor debe ser mayor de 18 años.")
+
+        if 0 <= edad < 120:
+            self.__edad = edad
+        else:
+            raise IllegalArgumentException("La edad no puede ser negativa ni mayor a 120.")
+
+
+class InterfazVendedor:
+    """
+    Clase dedicada exclusivamente a la interfaz gráfica y la recolección de datos por teclado.
+    """
+
+    def __init__(self, master):
+        """Inicializa la ventana principal y los campos de entrada de datos."""
+        self.master = master
+        master.title("Prueba de Excepciones - Ejercicio 6.5")
+        master.geometry("450x450")
+
+        tk.Label(master, text="Nombre del vendedor:").pack(pady=(15, 0))
+        self.entry_nombre = tk.Entry(master, width=35)
+        self.entry_nombre.pack()
+
+        tk.Label(master, text="Apellidos del vendedor:").pack(pady=(10, 0))
+        self.entry_apellidos = tk.Entry(master, width=35)
+        self.entry_apellidos.pack()
+
+        tk.Label(master, text="Edad del vendedor:").pack(pady=(10, 0))
+        self.entry_edad = tk.Entry(master, width=35)
+        self.entry_edad.pack()
+
+        self.btn_ejecutar = tk.Button(master, text="Ejecutar", command=self.ejecutar_metodo_principal)
+        self.btn_ejecutar.pack(pady=20)
+
+        self.consola = scrolledtext.ScrolledText(master, width=50, height=12, state='disabled')
+        self.consola.pack(padx=10, pady=10)
+
+    def imprimir_pantalla(self, mensaje):
+        """Simula la instrucción System.out.println() imprimiendo en el widget de texto."""
+        self.consola.config(state='normal')
+        self.consola.insert(tk.END, mensaje + "\n")
+        self.consola.see(tk.END)
+        self.consola.config(state='disabled')
+
+    def limpiar_pantalla(self):
+        """Limpia el área de la consola antes de una nueva ejecución."""
+        self.consola.config(state='normal')
+        self.consola.delete('1.0', tk.END)
+        self.consola.config(state='disabled')
+
+    def ejecutar_metodo_principal(self):
+        """
+        Equivalente al método main. Captura los datos, instancia la clase
+        y maneja la excepción arrojada por la verificación.
+        """
+        self.limpiar_pantalla()
+
+        nombre = self.entry_nombre.get()
+        apellidos = self.entry_apellidos.get()
+        entrada_edad = self.entry_edad.get()
+
+        self.imprimir_pantalla("Nombre del vendedor = ")
+        self.imprimir_pantalla(nombre)
+        self.imprimir_pantalla("Apellidos del vendedor = ")
+        self.imprimir_pantalla(apellidos)
+        self.imprimir_pantalla("Edad del vendedor = ")
+        self.imprimir_pantalla(entrada_edad)
+
+        vendedor = Vendedor(nombre, apellidos)
+
+        try:
+            edad_entero = int(entrada_edad)
+            vendedor.verificar_edad(edad_entero)
+            vendedor.imprimir(self.imprimir_pantalla)
+        except IllegalArgumentException as e:
+            self.imprimir_pantalla(f"java.lang.IllegalArgumentException: {e}")
+        except ValueError:
+            self.imprimir_pantalla("java.util.InputMismatchException: La edad debe ser un número entero.")
+
+
+if __name__ == "__main__":
+    ventana_principal = tk.Tk()
+    app = InterfazVendedor(ventana_principal)
+    ventana_principal.mainloop()
